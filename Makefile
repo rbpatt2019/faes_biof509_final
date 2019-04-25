@@ -34,6 +34,11 @@ clean:
 	find . -type f -name "*.py[co]" -delete
 	find . -type d -name "__pycache__" -delete
 
+## Make presentation slides
+slides: notebooks/index.ipynb
+	jupyter nbconvert notebooks/index.ipynb --to slides --reveal-prefix="https://revealjs.com"
+	mv notebook/index.slides.html reports/index.html
+
 ## Lint using flake8
 lint:
 	isort -rc src
