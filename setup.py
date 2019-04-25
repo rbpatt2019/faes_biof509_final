@@ -8,5 +8,5 @@ setup(
     author='Ryan B Patterson',
     license='GPLv3',
     setup_requires=['pytest-runner'],
-    tests_require=['pytest', 'pytest-mypy'],
+    tests_require=['pytest', 'pytest-mypy', 'pytest-instafail'],
 )
