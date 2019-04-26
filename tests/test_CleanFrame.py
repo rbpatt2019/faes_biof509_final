@@ -11,8 +11,9 @@ def test_type_CleanFrame():
 
 def test_clean_col_defaults():
     test = cf.CleanFrame({" A B ": [1, 2], " C D ": [3, 4]})
-    assert all(test.clean_cols().columns == ["a_b", "c_d"])
-    assert all(test.clean_cols().columns != test.columns)
+    assert all(test.clean_cols().columns == ["a_b", "c_d"]) # Expected results
+    test.clean_cols()
+    assert all(test.columns == [' A B ', ' C D ']) # Insure is not in place
 
 def test_clean_col_type_check():
     test = cf.CleanFrame({" A B ": [1, 2], " C D ": [3, 4]})
@@ -24,12 +25,10 @@ def test_clean_col_type_check():
         test.clean_cols(inplace={1: False, "a": True})
         test.clean_cols(strip=1)
 
-    # def clean_cols(
-    #     self,
-    #     strip=True,
-    #     spaces=True,
-    #     space_char="_",
-    #     lower=True,
-    #     upper=False,
-    #     inplace=False,
-    # ):
+def test_filter_by_val_defaults():
+    test = cf.CleanFrame({"A": [1, 2], "B": [3, 4]})
+    # Expected results
+    assert all(test.filter_by_val(col="A", vals=[1]) == cf.CleanFrame({'A': [1], 'B': [3]}))
+    # Insure operation is not inplace
+    test.filter_by_val(col='A', vals=[1])
+    assert all(test == cf.CleanFrame({"A": [1, 2], "B": [3, 4]}))
