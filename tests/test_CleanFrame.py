@@ -17,6 +17,7 @@ def test_clean_col_defaults():
 
 def test_clean_col_type_check():
     test = cf.CleanFrame({" A B ": [1, 2], " C D ": [3, 4]})
+    # Test that wrong values raise a value error
     with pytest.raises(ValueError):
         test.clean_cols(strip=1)
         test.clean_cols(spaces="a")
@@ -32,3 +33,17 @@ def test_filter_by_val_defaults():
     # Insure operation is not inplace
     test.filter_by_val(col='A', vals=[1])
     assert all(test == cf.CleanFrame({"A": [1, 2], "B": [3, 4]}))
+
+def test_filter_by_val_type_check():
+    test = cf.CleanFrame({"A": [1, 2], "B": [3, 4]})
+    with pytest.raises(ValueError):
+        test.filter_by_val(col=1)
+        test.filter_by_val(col=['a', 'b', 'c'])
+        test.filter_by_val(col=False)
+        test.filter_by_val(vals=1)
+        test.filter_by_val(vals='a')
+        test.filter_by_val(vals=False)
+        test.filter_by_val(inplace=1)
+        test.filter_by_val(keep='a')
+        test.filter_by_val(inplace=(1, 2, 3))
+        test.filter_by_val(inplace=[True, False])
