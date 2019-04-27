@@ -17,6 +17,26 @@ The necessary files are:
     'Fronatl Cortex/frontal_batch 4__Proteins.txt'
     'Fronatl Cortex/frontal_batch 5__Proteins.txt'
 """
+import pandas as pd
+
 import src.data.CleanFrame as cf
 
-hold = pd.read_csv('data/external/cingulate_batch 1__Proteins.txt', usecols=['Master', 'Accession', 'Exp. q-value', 'Sum PEP Score', 'Abundance Ratio: (F1, 127N) / (F1, 126)', 'Abundance Ratio: (F1, 127N) / (F1, 126)', 'Abundance Ratio: (F1, 128N) / (F1, 126)', 'Abundance Ratio: (F1, 128C) / (F1, 126)', 'Abundance Ratio: (F1, 129N) / (F1, 126)', 'Abundance Ratio: (F1, 129C) / (F1, 126)', 'Abundance Ratio: (F1, 130N) / (F1, 126)', 'Abundance Ratio: (F1, 130C) / (F1, 126)'], sep=None, engine='python')
+hold = pd.read_csv(
+    "data/external/cingulate_batch 1__Proteins.txt",
+    usecols=[
+        "Master",
+        "Accession",
+        "Exp. q-value",
+        "Sum PEP Score",
+        "Abundance Ratio: (F1, 127N) / (F1, 126)",
+        "Abundance Ratio: (F1, 127N) / (F1, 126)",
+        "Abundance Ratio: (F1, 128N) / (F1, 126)",
+        "Abundance Ratio: (F1, 128C) / (F1, 126)",
+        "Abundance Ratio: (F1, 129N) / (F1, 126)",
+        "Abundance Ratio: (F1, 129C) / (F1, 126)",
+        "Abundance Ratio: (F1, 130N) / (F1, 126)",
+        "Abundance Ratio: (F1, 130C) / (F1, 126)",
+    ],
+    sep=None,
+    engine="python",
+)
