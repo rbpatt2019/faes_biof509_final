@@ -31,26 +31,6 @@ frontal_df = cf.CleanFrame()
 cingulate_files = glob.iglob('data/raw/c*')
 cingulate_df = cf.CleanFrame()
 
-def prep_data(cf):
-    """A function for project specific CleanFrame data tidying
-
-    This function calls, in order:
-        cf.clean_cols() to clean column names
-        cf.filter_by_vals() to sort only master peptides
-        pd.df.drop() to get rid of no longer necessary master column
-        pd.df.set_index() to set Accession column to index
-        pd.df.rename() to label samples
-    
-    Inputs
-    ------
-    cf: src.data.CleanFrame.CleanFrame
-        The input CleanFrame
-
-    Returns
-    -------
-    cf: src.data.CleanFrame.CleanFrame
-        The cleaned CleanFrame
-    """
 
 hold = pd.read_csv(
     "data/external/cingulate_batch 1__Proteins.txt",

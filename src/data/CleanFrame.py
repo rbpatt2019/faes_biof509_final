@@ -126,3 +126,25 @@ class CleanFrame(pd.core.frame.DataFrame):
             self._update_inplace(new_data)
         else:
             return new_data
+
+        
+    def prep_data(self):
+        """A function for project specific CleanFrame data tidying
+
+        This function calls, in order:
+            cf.clean_cols() to clean column names
+            cf.filter_by_vals() to sort only master peptides
+            pd.df.drop() to get rid of no longer necessary master column
+            pd.df.set_index() to set Accession column to index
+            pd.df.rename() to label samples
+        
+        Inputs
+        ------
+        cf: src.data.CleanFrame.CleanFrame
+            The input CleanFrame
+
+        Returns
+        -------
+        cf: src.data.CleanFrame.CleanFrame
+            The cleaned CleanFrame
+        """
