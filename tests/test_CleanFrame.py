@@ -47,3 +47,11 @@ def test_filter_by_val_type_check():
         test.filter_by_val(keep='a')
         test.filter_by_val(inplace=(1, 2, 3))
         test.filter_by_val(inplace=[True, False])
+
+def test_prep_data_defaults():
+    test = Pass
+    # Expected results
+    assert 
+    # Insure operation is not inplace
+    test.filter_by_val(col='A', vals=[1])
+    assert all(test == cf.CleanFrame({"A": [1, 2], "B": [3, 4]}))
