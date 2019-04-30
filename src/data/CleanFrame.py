@@ -127,24 +127,49 @@ class CleanFrame(pd.core.frame.DataFrame):
         else:
             return new_data
 
-        
-    def prep_data(self):
+    def prep_data(self, inplace=False):
         """A function for project specific CleanFrame data tidying
 
         This function calls, in order:
             cf.clean_cols() to clean column names
             cf.filter_by_vals() to sort only master peptides
             pd.df.drop() to get rid of no longer necessary master column
+            pd.df.dropna to get rid of any genes that do not have
             pd.df.set_index() to set Accession column to index
             pd.df.rename() to label samples
         
         Inputs
         ------
-        cf: src.data.CleanFrame.CleanFrame
-            The input CleanFrame
+        inplace: bool
+            If true, the operation occurs inplace, altering self.
 
-        Returns
+        Outputs
         -------
-        cf: src.data.CleanFrame.CleanFrame
-            The cleaned CleanFrame
+        new_data: CleanFrame
+            Only if inplace=False
+            The cleaned dataframe
         """
+        new_data = (
+            self.clean_cols()
+            .filter_by_val(col="master", vals=["IsMasterProtein"])
+            .drop(columns="master")
+            .dropna(axis=0)
+            .set_index("accession")
+            .rename(
+                columns={
+                    "abundance_ratio:_(f1,_127n)_/_(f1,_126)": "AD1",
+                    "abundance_ratio:_(f1,_127c)_/_(f1,_126)": "AD2",
+                    "abundance_ratio:_(f1,_128n)_/_(f1,_126)": "Control1",
+                    "abundance_ratio:_(f1,_128c)_/_(f1,_126)": "Control2",
+                    "abundance_ratio:_(f1,_129n)_/_(f1,_126)": "PD1",
+                    "abundance_ratio:_(f1,_129c)_/_(f1,_126)": "PD2",
+                    "abundance_ratio:_(f1,_130n)_/_(f1,_126)": "ADPD1",
+                    "abundance_ratio:_(f1,_130c)_/_(f1,_126)": "ADPD2",
+                }
+            )
+        )
+        # self._update_inplace is from pandas.core.frame
+        if inplace:
+            self._update_inplace(new_data)
+        else:
+            return new_data
