@@ -17,6 +17,7 @@ The necessary files are:
     'Fronatl Cortex/frontal_batch 4__Proteins.txt'
     'Fronatl Cortex/frontal_batch 5__Proteins.txt'
 """
+
 import glob
 
 import pandas as pd
@@ -24,15 +25,58 @@ import pandas as pd
 import src.data.CleanFrame as cf
 
 # Find files for fronal cortex
-fronal_files = glob.iglob('data/raw/f*')
+frontal_files = glob.iglob("data/raw/f*")
+frontal_read = (
+    pd.read_csv(
+        i,
+        usecols=[
+            "Master",
+            "Accession",
+            "Exp. q-value",
+            "Sum PEP Score",
+            "Abundance Ratio: (F1, 127N) / (F1, 126)",
+            "Abundance Ratio: (F1, 127C) / (F1, 126)",
+            "Abundance Ratio: (F1, 128N) / (F1, 126)",
+            "Abundance Ratio: (F1, 128C) / (F1, 126)",
+            "Abundance Ratio: (F1, 129N) / (F1, 126)",
+            "Abundance Ratio: (F1, 129C) / (F1, 126)",
+            "Abundance Ratio: (F1, 130N) / (F1, 126)",
+            "Abundance Ratio: (F1, 130C) / (F1, 126)",
+        ],
+        sep=None,
+        engine="python",
+    )
+    for i in frontal_files
+)
+frontal_cfs = (cf.CleanFrame(i) for i in frontal_read)
+frontal_clean = (i.prep_data() for i in frontal_cfs)
+
+# pd.read_csv("data/external/cingulate_batch 1__Proteins.txt",
+#     usecols=[
+#         "Master",
+#         "Accession",
+#         "Exp. q-value",
+#         "Sum PEP Score",
+#         "Abundance Ratio: (F1, 127N) / (F1, 126)",
+#         "Abundance Ratio: (F1, 127N) / (F1, 126)",
+#         "Abundance Ratio: (F1, 128N) / (F1, 126)",
+#         "Abundance Ratio: (F1, 128C) / (F1, 126)",
+#         "Abundance Ratio: (F1, 129N) / (F1, 126)",
+#         "Abundance Ratio: (F1, 129C) / (F1, 126)",
+#         "Abundance Ratio: (F1, 130N) / (F1, 126)",
+#         "Abundance Ratio: (F1, 130C) / (F1, 126)",
+#     ],
+#     sep=None,
+#     engine="python",
+# )
 frontal_df = cf.CleanFrame()
 
-#find files for cingulate cortex
-cingulate_files = glob.iglob('data/raw/c*')
+# find files for cingulate cortex
+cingulate_files = glob.iglob("data/raw/c*")
 cingulate_df = cf.CleanFrame()
 
 
-hold = pd.read_csv(
+pd.read_csv(
     "data/external/cingulate_batch 1__Proteins.txt",
     usecols=[
         "Master",
@@ -50,5 +94,4 @@ hold = pd.read_csv(
     ],
     sep=None,
     engine="python",
-    B
 )
