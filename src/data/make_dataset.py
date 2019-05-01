@@ -24,7 +24,8 @@ import pandas as pd
 
 import src.data.CleanFrame as cf
 
-def make_data(files, usecols=None, axis=0, join='outer', keys=None):
+
+def make_data(files, usecols=None, axis=0, join="outer", keys=None):
     """Make a full CleanFrame from multiple files
 
     Uses glob to find all files matching files
@@ -57,70 +58,68 @@ def make_data(files, usecols=None, axis=0, join='outer', keys=None):
         The full CleanFrame
     """
     # Type check files
-    if not is(files, str):
-        raise ValueError(f'files must be a str, not {type(files)}')
+    if not isinstance(files, str):
+        raise ValueError(f"files must be a str, not {type(files)}")
     # Find files
     paths = glob.iglob(files)
     # Read in files, sep=None with engine='python' will auto determine delim
-    reads = (pd.read_csv(file, usecols=usecols, sep=None, engine='python') for file in paths)
+    reads = (
+        pd.read_csv(file, usecols=usecols, sep=None, engine="python") for file in paths
+    )
     # Convert to CleanFrame
     cfs = (cf.CleanFrame(i) for i in reads)
     # Clean data
     clean = (i.prep_data() for i in cfs)
     # Create final CleanFrame
     data = cf.CleanFrame(
-        pd.concat(
-            clean,
-            axis=axis,
-            join=join,
-            keys=keys,
-            sort=False,
-            copy=False,
-        )
+        pd.concat(clean, axis=axis, join=join, keys=keys, sort=False, copy=False)
     )
     return data
 
-# pd.read_csv("data/external/cingulate_batch 1__Proteins.txt",
-#     usecols=[
-#         "Master",
-#         "Accession",
-#         "Exp. q-value",
-#         "Sum PEP Score",
-#         "Abundance Ratio: (F1, 127N) / (F1, 126)",
-#         "Abundance Ratio: (F1, 127N) / (F1, 126)",
-#         "Abundance Ratio: (F1, 128N) / (F1, 126)",
-#         "Abundance Ratio: (F1, 128C) / (F1, 126)",
-#         "Abundance Ratio: (F1, 129N) / (F1, 126)",
-#         "Abundance Ratio: (F1, 129C) / (F1, 126)",
-#         "Abundance Ratio: (F1, 130N) / (F1, 126)",
-#         "Abundance Ratio: (F1, 130C) / (F1, 126)",
-#     ],
-#     sep=None,
-#     engine="python",
-# )
-frontal_df = cf.CleanFrame()
 
-# find files for cingulate cortex
-cingulate_files = glob.iglob("data/raw/c*")
-cingulate_df = cf.CleanFrame()
+if __name__ == "__main__":
+    # Frontal cortex data
+    frontal = make_data(
+        "data/raw/f*",
+        usecols=[
+            "Master",
+            "Accession",
+            "Exp. q-value",
+            "Sum PEP Score",
+            "Abundance Ratio: (F1, 127N) / (F1, 126)",
+            "Abundance Ratio: (F1, 127C) / (F1, 126)",
+            "Abundance Ratio: (F1, 128N) / (F1, 126)",
+            "Abundance Ratio: (F1, 128C) / (F1, 126)",
+            "Abundance Ratio: (F1, 129N) / (F1, 126)",
+            "Abundance Ratio: (F1, 129C) / (F1, 126)",
+            "Abundance Ratio: (F1, 130N) / (F1, 126)",
+            "Abundance Ratio: (F1, 130C) / (F1, 126)",
+        ],
+        axis=1,
+        join="inner",
+        keys=[1, 2, 3, 4, 5],
+    )
+    pd.to_pickle(frontal, 'data/interim/frontal_full.pkl')
 
-
-pd.read_csv(
-    "data/external/cingulate_batch 1__Proteins.txt",
-    usecols=[
-        "Master",
-        "Accession",
-        "Exp. q-value",
-        "Sum PEP Score",
-        "Abundance Ratio: (F1, 127N) / (F1, 126)",
-        "Abundance Ratio: (F1, 127N) / (F1, 126)",
-        "Abundance Ratio: (F1, 128N) / (F1, 126)",
-        "Abundance Ratio: (F1, 128C) / (F1, 126)",
-        "Abundance Ratio: (F1, 129N) / (F1, 126)",
-        "Abundance Ratio: (F1, 129C) / (F1, 126)",
-        "Abundance Ratio: (F1, 130N) / (F1, 126)",
-        "Abundance Ratio: (F1, 130C) / (F1, 126)",
-    ],
-    sep=None,
-    engine="python",
-)
+    # Anterior cingulate cortex data
+    cingulate = make_data(
+        "data/raw/c*",
+        usecols=[
+            "Master",
+            "Accession",
+            "Exp. q-value",
+            "Sum PEP Score",
+            "Abundance Ratio: (F1, 127N) / (F1, 126)",
+            "Abundance Ratio: (F1, 127C) / (F1, 126)",
+            "Abundance Ratio: (F1, 128N) / (F1, 126)",
+            "Abundance Ratio: (F1, 128C) / (F1, 126)",
+            "Abundance Ratio: (F1, 129N) / (F1, 126)",
+            "Abundance Ratio: (F1, 129C) / (F1, 126)",
+            "Abundance Ratio: (F1, 130N) / (F1, 126)",
+            "Abundance Ratio: (F1, 130C) / (F1, 126)",
+        ],
+        axis=1,
+        join="inner",
+        keys=[1, 2, 3, 4, 5],
+    )
+    pd.to_pickle(frontal, 'data/interim/cingulate_full.pkl')
