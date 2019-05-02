@@ -99,7 +99,7 @@ if __name__ == "__main__":
         join="inner",
         keys=[1, 2, 3, 4, 5],
     )
-    pd.to_pickle(frontal, 'data/interim/frontal_full.pkl')
+    pd.to_pickle(frontal, "data/interim/frontal_full.pkl")
 
     # Anterior cingulate cortex data
     cingulate = make_data(
@@ -122,4 +122,4 @@ if __name__ == "__main__":
         join="inner",
         keys=[1, 2, 3, 4, 5],
     )
-    pd.to_pickle(frontal, 'data/interim/cingulate_full.pkl')
+    pd.to_pickle(frontal, "data/interim/cingulate_full.pkl")
