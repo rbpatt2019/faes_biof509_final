@@ -44,6 +44,12 @@ def make_data(
     usecols: list-like or callable, optional
         Return a subset of columns
         See https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html
+    names: array-like, optional
+        List of column names to use.
+        See https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html
+    index_col: int, sequence or bool, optional
+        Column to use as the row labels of the DataFrame.
+        See https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html
     aixs: {0/'index', 1/'columns'}, default 0
         for pd.concat
         The axis to concatenate along
