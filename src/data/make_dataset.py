@@ -25,7 +25,9 @@ import pandas as pd
 import src.data.CleanFrame as cf
 
 
-def make_data(files, usecols=None, axis=0, join="outer", keys=None):
+def make_data(
+    files, usecols=None, names=None, index_col=None, axis=0, join="outer", keys=None
+):
     """Make a full CleanFrame from multiple files
 
     Uses glob to find all files matching files
@@ -64,7 +66,16 @@ def make_data(files, usecols=None, axis=0, join="outer", keys=None):
     paths = glob.iglob(files)
     # Read in files, sep=None with engine='python' will auto determine delim
     reads = (
-        pd.read_csv(file, usecols=usecols, sep=None, engine="python") for file in paths
+        pd.read_csv(
+            file,
+            usecols=usecols,
+            header=0,
+            names=names,
+            index_col=index_col,
+            sep=None,
+            engine="python",
+        )
+        for file in paths
     )
     # Convert to CleanFrame
     cfs = (cf.CleanFrame(i) for i in reads)
@@ -81,20 +92,22 @@ if __name__ == "__main__":
     # Frontal cortex data
     frontal = make_data(
         "data/raw/f*",
-        usecols=[
-            "Master",
-            "Accession",
-            "Exp. q-value",
-            "Sum PEP Score",
-            "Abundance Ratio: (F1, 127N) / (F1, 126)",
-            "Abundance Ratio: (F1, 127C) / (F1, 126)",
-            "Abundance Ratio: (F1, 128N) / (F1, 126)",
-            "Abundance Ratio: (F1, 128C) / (F1, 126)",
-            "Abundance Ratio: (F1, 129N) / (F1, 126)",
-            "Abundance Ratio: (F1, 129C) / (F1, 126)",
-            "Abundance Ratio: (F1, 130N) / (F1, 126)",
-            "Abundance Ratio: (F1, 130C) / (F1, 126)",
+        usecols=[2, 5, 9, 10, 72, 73, 74, 75, 76, 77, 78, 79],
+        names=[
+            "master",
+            "accession",
+            "q_score",
+            "pep_score",
+            "AD1",
+            "AD2",
+            "Control1",
+            "Control2",
+            "PD1",
+            "PD2",
+            "ADPD1",
+            "ADPD2",
         ],
+        index_col=1,
         axis=1,
         join="inner",
         keys=[1, 2, 3, 4, 5],
@@ -104,20 +117,22 @@ if __name__ == "__main__":
     # Anterior cingulate cortex data
     cingulate = make_data(
         "data/raw/c*",
-        usecols=[
-            "Master",
-            "Accession",
-            "Exp. q-value",
-            "Sum PEP Score",
-            "Abundance Ratio: (F1, 127N) / (F1, 126)",
-            "Abundance Ratio: (F1, 127C) / (F1, 126)",
-            "Abundance Ratio: (F1, 128N) / (F1, 126)",
-            "Abundance Ratio: (F1, 128C) / (F1, 126)",
-            "Abundance Ratio: (F1, 129N) / (F1, 126)",
-            "Abundance Ratio: (F1, 129C) / (F1, 126)",
-            "Abundance Ratio: (F1, 130N) / (F1, 126)",
-            "Abundance Ratio: (F1, 130C) / (F1, 126)",
+        usecols=[2, 5, 9, 10, 72, 73, 74, 75, 76, 77, 78, 79],
+        names=[
+            "master",
+            "accession",
+            "q_score",
+            "pep_score",
+            "AD1",
+            "AD2",
+            "Control1",
+            "Control2",
+            "PD1",
+            "PD2",
+            "ADPD1",
+            "ADPD2",
         ],
+        index_col=1,
         axis=1,
         join="inner",
         keys=[1, 2, 3, 4, 5],

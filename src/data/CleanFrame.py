@@ -135,8 +135,6 @@ class CleanFrame(pd.core.frame.DataFrame):
             cf.filter_by_vals() to sort only master peptides
             pd.df.drop() to get rid of no longer necessary master column
             pd.df.dropna to get rid of any genes that do not have
-            pd.df.set_index() to set Accession column to index
-            pd.df.rename() to label samples
         
         Inputs
         ------
@@ -154,19 +152,6 @@ class CleanFrame(pd.core.frame.DataFrame):
             .filter_by_val(col="master", vals=["IsMasterProtein"])
             .drop(columns="master")
             .dropna(axis=0)
-            .set_index("accession")
-            .rename(
-                columns={
-                    "abundance_ratio:_(f1,_127n)_/_(f1,_126)": "AD1",
-                    "abundance_ratio:_(f1,_127c)_/_(f1,_126)": "AD2",
-                    "abundance_ratio:_(f1,_128n)_/_(f1,_126)": "Control1",
-                    "abundance_ratio:_(f1,_128c)_/_(f1,_126)": "Control2",
-                    "abundance_ratio:_(f1,_129n)_/_(f1,_126)": "PD1",
-                    "abundance_ratio:_(f1,_129c)_/_(f1,_126)": "PD2",
-                    "abundance_ratio:_(f1,_130n)_/_(f1,_126)": "ADPD1",
-                    "abundance_ratio:_(f1,_130c)_/_(f1,_126)": "ADPD2",
-                }
-            )
         )
         # self._update_inplace is from pandas.core.frame
         if inplace:
