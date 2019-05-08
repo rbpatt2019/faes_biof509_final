@@ -57,6 +57,7 @@ if __name__ == "__main__":
             axis=1,
         ).mean(axis=1)
     )
+    pd.to_pickle(frontal_volc, 'data/interim/frontal_volcano.pkl')
 
     #Prep for volcano plot - cingulate
     cingulate_volc = pd.DataFrame()
@@ -91,6 +92,7 @@ if __name__ == "__main__":
             axis=1,
         ).mean(axis=1)
     )
+    pd.to_pickle(cingulate_volc, 'data/interim/cingulate_volcano.pkl')
 
     # Create red, black green custom color map
     cmap = LinearSegmentedColormap.from_list('Volcano', [(1, 0, 0), (0, 0, 0), (0, 1, 0)], N=3)
@@ -102,12 +104,22 @@ if __name__ == "__main__":
     for df in (frontal_volc, cingulate_volc):
         fig, ax = plt.subplots(nrows=1, ncols=3, sharex=True, sharey=True)
         fig.suptitle(df.name)
+        fig.text(0.5, 0.05, 'log2(fold change)', ha='center', va='center', fontsize=8)
+        fig.text(0.05, 0.5, '-log10(q-score)', ha='center', va='center', rotation='vertical', fontsize=8)
         for items in zip(cols_data, cols_color, ax):
             # Creates color column
             conditions = [(df['-log10_q'] >= 1.30103) & (df[items[0]] >= 0.5), (df['-log10_q'] >= 1.30103) & (df[items[0]] <= -0.5)]
             df[items[1]] = np.select(conditions, choices, default=1)
             # Creates volcano plots
-            items[2].scatter(df[items[0]], df['-log10_q'], c=df[items[1]], cmap=cmap)
-            items[2].set_title(items[0].split('_')[1])
+            items[2].scatter(df[items[0]], df['-log10_q'], c=df[items[1]], cmap=cmap, s=1)
+            items[2].set_title(items[0].split('_')[1].upper(), fontsize=8)
+            items[2].set_xbound(lower=-2.1, upper=5.1)
+            items[2].set_xticks(np.arange(-2, 5.1, 1), minor=False)
+            items[2].set_xticks(np.arange(-2, 5.1, 0.25), minor=True)
+            items[2].set_xticklabels([-2, -1, 0, 1, 2, 3, 4, 5], fontsize=4)
+            items[2].set_ybound(lower=0, upper=6.1)
+            items[2].set_yticks(np.arange(0, 6.1, 1), minor=False)
+            items[2].set_yticks(np.arange(0, 6.1, 0.25), minor=True)
+            items[2].set_yticklabels([0, 1, 2, 3, 4, 5, 6], fontsize=4)
         plt.savefig(f'reports/figures/{df.name}.png', dpi=600)
         plt.close()
