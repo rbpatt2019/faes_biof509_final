@@ -35,7 +35,7 @@ clean:
 	find . -type d -name "__pycache__" -delete
 
 ## Make presentation slides
-slides: notebooks/index.ipynb
+slides: 
 	jupyter nbconvert notebooks/index.ipynb --to slides --reveal-prefix="https://revealjs.com"
 	mv notebook/index.slides.html reports/index.html
 
