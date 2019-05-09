@@ -37,7 +37,7 @@ clean:
 ## Make presentation slides
 slides: 
 	jupyter nbconvert notebooks/index.ipynb --to slides --reveal-prefix="https://revealjs.com"
-	mv notebook/index.slides.html reports/index.html
+	mv notebooks/index.slides.html reports/index.slides.html
 
 ## Lint using flake8
 lint:
