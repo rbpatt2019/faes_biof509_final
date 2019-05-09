@@ -17,7 +17,7 @@ cingulate = pd.read_pickle("data/interim/cingulate_full.pkl")
 
 # Prep for volcano plot - frontal
 frontal_volc = pd.DataFrame()
-frontal_volc.name = "Frontal Cortex Volcano Plots"
+frontal_volc.name = "Frontal_Cortex_Volcano_Plots"
 frontal_volc["-log10_q"] = -np.log10(
     frontal.xs("q_score", level=1, axis=1).mean(axis=1).replace(0, 0.000001)
 )
@@ -52,7 +52,7 @@ pd.to_pickle(frontal_volc, "data/interim/frontal_volcano.pkl")
 
 # Prep for volcano plot - cingulate
 cingulate_volc = pd.DataFrame()
-cingulate_volc.name = "Anterior Cingulate Gyrus Volcano Plots"
+cingulate_volc.name = "Anterior_Cingulate_Gyrus_Volcano_Plots"
 cingulate_volc["-log10_q"] = -np.log10(
     cingulate.xs("q_score", level=1, axis=1).mean(axis=1).replace(0, 0.000001)
 )

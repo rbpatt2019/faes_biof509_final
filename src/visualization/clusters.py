@@ -43,10 +43,6 @@ pipe_frontal = Pipeline(
 )
 embedding_frontal = pipe_frontal.fit_transform(X_frontal)
 
-# Reducer for tSNE
-tsne_frontal = TSNEVisualizer(decompose='pca', decompose_by=40, random_state=1)
-tsne_frontal.fit(X_frontal, y_frontal)
-
 # Prep for umap plot - cingulate
 cingulate_umap = (
     cf.CleanFrame(cingulate)
@@ -69,10 +65,6 @@ y_cingulate = cingulate_umap["label"]
 reducer_cingulate = umap.UMAP(random_state=1)
 embedding_cingulate = reducer_cingulate.fit_transform(X_cingulate)
 
-# Reducer for tSNE
-tsne_cingulate = TSNEVisualizer(decompose='pca', decompose_by=40, random_state=1)
-tsne_cingulate.fit(X_cingulate, y_cingulate)
-
 # Create conditions/choices for colors
 choices = [1, 2, 3]
 cond_frontal = [y_frontal == 'ad', y_frontal == 'pd', y_frontal == 'adpd']
@@ -85,40 +77,16 @@ for data in zip((embedding_frontal, embedding_cingulate), (cond_frontal, cond_ci
     cbar = plt.colorbar(boundaries=np.arange(5)-0.5, ticks=np.arange(4))
     cbar.ax.set_yticklabels(['Control', 'AD', 'PD', 'ADPD'])
     plt.title(f'UMAP Plot - {data[2]}')
-    plt.savefig(f'reports/figures/UMAP{data[2]}.png', dpi=600)
+    plt.savefig(f'reports/figures/UMAP_{data[2]}.png', dpi=600)
     plt.close()
 
-for df in (frontal_volc, cingulate_volc):
-    fig, ax = plt.subplots(nrows=1, ncols=3, sharex=True, sharey=True)
-    fig.suptitle(df.name)
-    fig.text(0.5, 0.05, "log2(fold change)", ha="center", va="center", fontsize=8)
-    fig.text(
-        0.05,
-        0.5,
-        "-log10(q-score)",
-        ha="center",
-        va="center",
-        rotation="vertical",
-        fontsize=8,
-    )
-    for items in zip(cols_data, cols_color, ax):
-        # Creates color column
-        conditions = [
-            (df["-log10_q"] >= 1.30103) & (df[items[0]] >= 0.5),
-            (df["-log10_q"] >= 1.30103) & (df[items[0]] <= -0.5),
-        ]
-        df[items[1]] = np.select(conditions, choices, default=1)
-        # Creates volcano plots
-        items[2].scatter(df[items[0]], df["-log10_q"], c=df[items[1]], cmap=cmap, s=1)
-        items[2].set_title(items[0].split("_")[1].upper(), fontsize=8)
-        items[2].set_xbound(lower=-2.1, upper=5.1)
-        items[2].set_xticks(np.arange(-2, 5.1, 1), minor=False)
-        items[2].set_xticks(np.arange(-2, 5.1, 0.25), minor=True)
-        items[2].set_xticklabels([-2, -1, 0, 1, 2, 3, 4, 5], fontsize=4)
-        items[2].set_ybound(lower=0, upper=6.1)
-        items[2].set_yticks(np.arange(0, 6.1, 1), minor=False)
-        items[2].set_yticks(np.arange(0, 6.1, 0.25), minor=True)
-        items[2].set_yticklabels([0, 1, 2, 3, 4, 5, 6], fontsize=4)
-    plt.savefig(f"reports/figures/{df.name}.png", dpi=600)
-    plt.close()
-print("Volcano Plots Made!")
+# Reducer for tSNE
+tsne_frontal = TSNEVisualizer(decompose=None, random_state=1, perplexity=10)
+tsne_frontal.fit(X_frontal, y_frontal)
+tsne_frontal.poof(outpath='reports/figures/tsne_frontal.png')
+
+# Reducer for tSNE
+tsne_cingulate = TSNEVisualizer(decompose=None, random_state=1, perplexity=10)
+tsne_cingulate.fit(X_cingulate, y_cingulate)
+tsne_cingulate.poof(outpath='reports/figures/tsne_cingulate.png')
+

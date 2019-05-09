@@ -1,6 +1,6 @@
 """A script for visualising data before feature engineering and training
 
-Two plots are used here - volcano and UMAP
+Three plots are used here - volcano and UMAP and tSNE
 
 The volcano plot allows for a visualisation of those genes that are differentially expressed
 and the significance of those changes.
@@ -13,3 +13,4 @@ but am currently too short on time
 """
 
 import src.visualization.volcano
+import src.visualization.clusters
