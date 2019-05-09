@@ -44,7 +44,7 @@ pipe_frontal = Pipeline(
 embedding_frontal = pipe_frontal.fit_transform(X_frontal)
 
 # Reducer for tSNE
-tsne_frontal = TSNEVisualizer(decompose='PCA', decompose_by=40, random_state=1)
+tsne_frontal = TSNEVisualizer(decompose='pca', decompose_by=40, random_state=1)
 tsne_frontal.fit(X_frontal, y_frontal)
 
 # Prep for umap plot - cingulate
@@ -70,13 +70,24 @@ reducer_cingulate = umap.UMAP(random_state=1)
 embedding_cingulate = reducer_cingulate.fit_transform(X_cingulate)
 
 # Reducer for tSNE
-tsne_cingulate = TSNEVisualizer(decompose='PCA', decompose_by=40, random_state=1)
+tsne_cingulate = TSNEVisualizer(decompose='pca', decompose_by=40, random_state=1)
 tsne_cingulate.fit(X_cingulate, y_cingulate)
 
-# Set color column and plot
-cols_data = ("log2_ad", "log2_pd", "log2_adpd")
-cols_color = ("ad_color", "pd_color", "adpd_color")
-choices = [2, 0]
+# Create conditions/choices for colors
+choices = [1, 2, 3]
+cond_frontal = [y_frontal == 'ad', y_frontal == 'pd', y_frontal == 'adpd']
+cond_cingulate = [y_cingulate == 'ad', y_cingulate == 'pd', y_cingulate == 'adpd']
+
+# Plot UMAP
+for data in zip((embedding_frontal, embedding_cingulate), (cond_frontal, cond_cingulate), ('Frontal', 'Cingulate')):
+    plt.scatter(data[0][:, 0], data[0][:, 1], s=5, c=np.select(data[1], choices, 0), cmap='Spectral')
+    plt.gca().set_aspect('equal', 'datalim')
+    cbar = plt.colorbar(boundaries=np.arange(5)-0.5, ticks=np.arange(4))
+    cbar.ax.set_yticklabels(['Control', 'AD', 'PD', 'ADPD'])
+    plt.title(f'UMAP Plot - {data[2]}')
+    plt.savefig(f'reports/figures/UMAP{data[2]}.png', dpi=600)
+    plt.close()
+
 for df in (frontal_volc, cingulate_volc):
     fig, ax = plt.subplots(nrows=1, ncols=3, sharex=True, sharey=True)
     fig.suptitle(df.name)
