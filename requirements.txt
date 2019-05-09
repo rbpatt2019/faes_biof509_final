@@ -20,3 +20,4 @@ scipy==1.2.1
 Sphinx==2.0.1
 umap-learn==0.3.8
 virtualenv==16.5.0
+yellowbrick==0.9.1
