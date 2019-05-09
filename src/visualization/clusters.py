@@ -67,26 +67,35 @@ embedding_cingulate = reducer_cingulate.fit_transform(X_cingulate)
 
 # Create conditions/choices for colors
 choices = [1, 2, 3]
-cond_frontal = [y_frontal == 'ad', y_frontal == 'pd', y_frontal == 'adpd']
-cond_cingulate = [y_cingulate == 'ad', y_cingulate == 'pd', y_cingulate == 'adpd']
+cond_frontal = [y_frontal == "ad", y_frontal == "pd", y_frontal == "adpd"]
+cond_cingulate = [y_cingulate == "ad", y_cingulate == "pd", y_cingulate == "adpd"]
 
 # Plot UMAP
-for data in zip((embedding_frontal, embedding_cingulate), (cond_frontal, cond_cingulate), ('Frontal', 'Cingulate')):
-    plt.scatter(data[0][:, 0], data[0][:, 1], s=5, c=np.select(data[1], choices, 0), cmap='Spectral')
-    plt.gca().set_aspect('equal', 'datalim')
-    cbar = plt.colorbar(boundaries=np.arange(5)-0.5, ticks=np.arange(4))
-    cbar.ax.set_yticklabels(['Control', 'AD', 'PD', 'ADPD'])
-    plt.title(f'UMAP Plot - {data[2]}')
-    plt.savefig(f'reports/figures/UMAP_{data[2]}.png', dpi=600)
+for data in zip(
+    (embedding_frontal, embedding_cingulate),
+    (cond_frontal, cond_cingulate),
+    ("Frontal", "Cingulate"),
+):
+    plt.scatter(
+        data[0][:, 0],
+        data[0][:, 1],
+        s=5,
+        c=np.select(data[1], choices, 0),
+        cmap="Spectral",
+    )
+    plt.gca().set_aspect("equal", "datalim")
+    cbar = plt.colorbar(boundaries=np.arange(5) - 0.5, ticks=np.arange(4))
+    cbar.ax.set_yticklabels(["Control", "AD", "PD", "ADPD"])
+    plt.title(f"UMAP Plot - {data[2]}")
+    plt.savefig(f"reports/figures/UMAP_{data[2]}.png", dpi=600)
     plt.close()
 
 # Reducer for tSNE
 tsne_frontal = TSNEVisualizer(decompose=None, random_state=1, perplexity=10)
 tsne_frontal.fit(X_frontal, y_frontal)
-tsne_frontal.poof(outpath='reports/figures/tsne_frontal.png')
+tsne_frontal.poof(outpath="reports/figures/tsne_frontal.png")
 
 # Reducer for tSNE
 tsne_cingulate = TSNEVisualizer(decompose=None, random_state=1, perplexity=10)
 tsne_cingulate.fit(X_cingulate, y_cingulate)
-tsne_cingulate.poof(outpath='reports/figures/tsne_cingulate.png')
-
+tsne_cingulate.poof(outpath="reports/figures/tsne_cingulate.png")

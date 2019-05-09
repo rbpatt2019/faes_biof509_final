@@ -6,9 +6,9 @@ and the significance of those changes.
 This would probably be better structured in some kind of visualising class with methods
 but am currently too short on time
 """
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from matplotlib.colors import LinearSegmentedColormap
 
 # Read in the data
@@ -115,9 +115,7 @@ for df in (frontal_volc, cingulate_volc):
         ]
         df[items[1]] = np.select(conditions, choices, default=1)
         # Creates volcano plots
-        items[2].scatter(
-            df[items[0]], df["-log10_q"], c=df[items[1]], cmap=cmap, s=1
-        )
+        items[2].scatter(df[items[0]], df["-log10_q"], c=df[items[1]], cmap=cmap, s=1)
         items[2].set_title(items[0].split("_")[1].upper(), fontsize=8)
         items[2].set_xbound(lower=-2.1, upper=5.1)
         items[2].set_xticks(np.arange(-2, 5.1, 1), minor=False)
@@ -129,4 +127,4 @@ for df in (frontal_volc, cingulate_volc):
         items[2].set_yticklabels([0, 1, 2, 3, 4, 5, 6], fontsize=4)
     plt.savefig(f"reports/figures/{df.name}.png", dpi=600)
     plt.close()
-print('Volcano Plots Made!')
+print("Volcano Plots Made!")

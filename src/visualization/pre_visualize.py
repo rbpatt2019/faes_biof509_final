@@ -12,5 +12,5 @@ This would probably be better structured in some kind of visualising class with 
 but am currently too short on time
 """
 
-import src.visualization.volcano
 import src.visualization.clusters
+import src.visualization.volcano
