@@ -1,14 +1,18 @@
-"""A script for making UMAP plots
+"""A script for making UMAP plots and tSNE plots
 
 UMAP is an alternative to tSNE that has some benefits such as speed and retaining local structure
 
 This would probably be better structured in some kind of visualising class with methods
 but am currently too short on time
 """
-import umap
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import umap
+from sklearn.decomposition import PCA
+from sklearn.pipeline import Pipeline
+from yellowbrick.text import TSNEVisualizer
+
 import src.data.CleanFrame as cf
 
 # Read in the data
@@ -23,11 +27,25 @@ frontal_umap = (
     .drop(columns=["level_0"])
     .rename(columns={"level_1": "label"})
     .filter_by_val(col="label", vals=["q_score", "pep_score"], keep=False)
+    .sort_values(by=["label"])
     .reset_index()
     .drop(columns=["index"])
 )
 frontal_umap["label"] = frontal_umap["label"].str[:-1]
+frontal_umap["label"] = frontal_umap["label"].astype("category")
 pd.to_pickle(frontal_umap, "data/interim/frontal_umap.pkl")
+
+# Reducer for umap, reccomended to reduce to 50 with PCA, then UMAP
+X_frontal = frontal_umap.drop(columns=["label"])
+y_frontal = frontal_umap["label"]
+pipe_frontal = Pipeline(
+    [("PCA", PCA(n_components=40, random_state=1)), ("UMAP", umap.UMAP(random_state=1))]
+)
+embedding_frontal = pipe_frontal.fit_transform(X_frontal)
+
+# Reducer for tSNE
+tsne_frontal = TSNEVisualizer(decompose='PCA', decompose_by=40, random_state=1)
+tsne_frontal.fit(X_frontal, y_frontal)
 
 # Prep for umap plot - cingulate
 cingulate_umap = (
@@ -37,11 +55,23 @@ cingulate_umap = (
     .drop(columns=["level_0"])
     .rename(columns={"level_1": "label"})
     .filter_by_val(col="label", vals=["q_score", "pep_score"], keep=False)
+    .sort_values(by=["label"])
     .reset_index()
     .drop(columns=["index"])
 )
 cingulate_umap["label"] = cingulate_umap["label"].str[:-1]
+cingulate_umap["label"] = cingulate_umap["label"].astype("category")
 pd.to_pickle(cingulate_umap, "data/interim/cingulate_umap.pkl")
+
+# Reducer for umap
+X_cingulate = cingulate_umap.drop(columns=["label"])
+y_cingulate = cingulate_umap["label"]
+reducer_cingulate = umap.UMAP(random_state=1)
+embedding_cingulate = reducer_cingulate.fit_transform(X_cingulate)
+
+# Reducer for tSNE
+tsne_cingulate = TSNEVisualizer(decompose='PCA', decompose_by=40, random_state=1)
+tsne_cingulate.fit(X_cingulate, y_cingulate)
 
 # Set color column and plot
 cols_data = ("log2_ad", "log2_pd", "log2_adpd")
