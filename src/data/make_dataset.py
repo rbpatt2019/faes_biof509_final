@@ -86,7 +86,13 @@ def make_data(
     # Convert to CleanFrame
     cfs = (cf.CleanFrame(i) for i in reads)
     # Clean data
-    clean = (i.prep_data() for i in cfs)
+    clean = (
+        i.clean_cols()
+        .filter_by_val(col="master", vals=["IsMasterProtein"])
+        .drop(columns="master")
+        .dropna(axis=0)
+        for i in cfs
+    )
     # Create final CleanFrame
     data = cf.CleanFrame(
         pd.concat(clean, axis=axis, join=join, keys=keys, sort=False, copy=False)
