@@ -3,6 +3,7 @@ from matplotlib.colors import LinearSegmentedColormap
 import numpy as np
 import pandas as pd
 
+
 class CleanFrame(pd.core.frame.DataFrame):
     """Sub-classed DataFrame with expanded method for cleaning
     
@@ -131,9 +132,21 @@ class CleanFrame(pd.core.frame.DataFrame):
         else:
             return new_data
 
-    def volcano(self, x, y, is_log=True, fold_cut=0.585, q_cut=1.301, title='Volcano Plot', title_size=12, label_size=8):
+    def volcano(
+        self,
+        x,
+        y,
+        is_log=True,
+        fold_cut=0.585,
+        q_cut=1.301,
+        title="Volcano Plot",
+        title_size=12,
+        label_size=8,
+        show=True,
+        save=False,
+        path="reports/figures/volcano.png",
+    ):
         """Makes a volcano plot of the data
-        Title the plot using self.name
 
         Inputs
         ------
@@ -152,25 +165,32 @@ class CleanFrame(pd.core.frame.DataFrame):
             Default is q_score less than 0.05
         title: str, Optional
             Plot title
-        title_size: numeric
+        title_size: numeric, Optional
             Font size, in pts, to use for Figure title
-        label_size: numeric
+        label_size: numeric, Optional
             Font size, in pts, to use for axes title
-
+        show: bool, Optional
+            If true, display the plot
+        save: bool, Optional
+            If true, save the plot
+        path: str, Optional
+            Where to save the plot, if save == True
+        
         Outputs
         -------
         """
         # Type check inputs
-        for i in (x, y, title):
+        for i in (x, y, title, path):
             if not isinstance(i, str):
                 raise ValueError(f"{i} must be a str")
-        if not isinstance(is_log, bool):
-            raise ValueError("is_log must be a bool")
+        for i in (is_log, show, save):
+            if not isinstance(i, bool):
+                raise ValueError(f"{i} must be a bool")
         for var in (title_size, label_size):
             try:
                 float(var)
             except (ValueError, TypeError) as err:
-                print(f'{var} needs to be numeric')
+                print(f"{var} needs to be numeric")
                 raise
 
         # Log, if necessary
@@ -187,40 +207,87 @@ class CleanFrame(pd.core.frame.DataFrame):
         )
 
         # Establish colors
-        conditions = [
-            (y >= q_cut) & (x >= fold_cut),
-            (y >= q_cut) & (x <= -fold_cut),
-        ]
+        conditions = [(y >= q_cut) & (x >= fold_cut), (y >= q_cut) & (x <= -fold_cut)]
         choices = [2, 0]
         colors = np.select(conditions, choices, default=1)
 
         # Plot data
-        plt.scatter(x, y, c=colors, cmap=cmap, s=1)
+        plt.scatter(x, y, c=colors, cmap=cmap, s=2, alpha=0.7)
+        plt.axvline(fold_cut, linestyle="--", color="gray", linewidth=1)
+        plt.axvline(-fold_cut, linestyle="--", color="gray", linewidth=1)
+        plt.axhline(q_cut, linestyle="--", color="gray", linewidth=1)
 
-        # Plot Basic
-        plt.title(title, fontdict={'fontsize': title_size})
+        # Plot settings
+        plt.title(title, fontdict={"fontsize": title_size})
+        plt.gca().set_aspect("equal", "datalim")
+        cbar = plt.colorbar(
+            boundaries=np.arange(4) - 0.5, ticks=np.arange(3), shrink=0.33
+        )
+        cbar.ax.set_yticklabels(
+            ["Sig. Under", "N.S.", "Sig. Over"], fontdict={"fontsize": label_size}
+        )
+        plt.xlabel("log2(fold_change)", fontdict={"fontsize": label_size})
+        plt.ylabel("-log10(q_score)", fontdict={"fontsize": label_size})
+        plt.savefig(path, dpi=600)
+
+    def umap(self, X, title="UMAP Plot", title_size=12, label_size=8, **kwargs):
+        """Makes a UMAP plot of the data
+
+        Inputs
+        ------
+        X: iterable
+            List of columns to be used as features
+        title: str, Optional
+            Plot title
+        title_size: numeric, Optional
+            Font size, in pts, to use for Figure title
+        label_size: numeric, Otional
+            Font size, in pts, to use for axes title
+        kwargs:
+            Additional parameters to be passed to umap.UMAP()
+
+        Outputs
+        -------
+        """
+        # Type check inputs
+        for i in (x, y, title):
+            if not isinstance(i, str):
+                raise ValueError(f"{i} must be a str")
+        if not isinstance(is_log, bool):
+            raise ValueError("is_log must be a bool")
+        for var in (title_size, label_size):
+            try:
+                float(var)
+            except (ValueError, TypeError) as err:
+                print(f"{var} needs to be numeric")
+                raise
+
+        # Log, if necessary
+        if not is_log:
+            x = np.log2(self[x])
+            y = -np.log10(self[y])
+        else:
+            x = self[x]
+            y = self[y]
+
+        # Create red, black green custom color map
+        cmap = LinearSegmentedColormap.from_list(
+            "Volcano", [(1, 0, 0), (0, 0, 0), (0, 1, 0)], N=3
+        )
+
+        # Establish colors
+        conditions = [(y >= q_cut) & (x >= fold_cut), (y >= q_cut) & (x <= -fold_cut)]
+        choices = [2, 0]
+        colors = np.select(conditions, choices, default=1)
+
+        # Plot data
+        plt.scatter(x, y, c=colors, cmap=cmap, s=2, alpha=0.7)
+
+        # Plot settings
+        plt.title(title, fontdict={"fontsize": title_size})
         plt.gca().set_aspect("equal", "datalim")
         cbar = plt.colorbar(boundaries=np.arange(4) - 0.5, ticks=np.arange(3))
         cbar.ax.set_yticklabels(["Sig. Under", "N.S.", "Sig. Over"])
-        plt.xlabel('log2(fold_change)', fontdict={'fontsize': label_size})
-        plt.ylabel('-log10(q_score)', fontdict={'fontsize': label_size})
-
-
-# # Set color column and plot
-# for df in (frontal_volc, cingulate_volc):
-#     for items in zip(cols_data, cols_color, ax):
-#         # Creates color column
-#         # Creates volcano plots
-#         items[2].scatter(df[items[0]], df["-log10_q"], c=df[items[1]], cmap=cmap, s=1)
-#         items[2].set_title(items[0].split("_")[1].upper(), fontsize=8)
-#         items[2].set_xbound(lower=-2.1, upper=5.1)
-#         items[2].set_xticks(np.arange(-2, 5.1, 1), minor=False)
-#         items[2].set_xticks(np.arange(-2, 5.1, 0.25), minor=True)
-#         items[2].set_xticklabels([-2, -1, 0, 1, 2, 3, 4, 5], fontsize=4)
-#         items[2].set_ybound(lower=0, upper=6.1)
-#         items[2].set_yticks(np.arange(0, 6.1, 1), minor=False)
-#         items[2].set_yticks(np.arange(0, 6.1, 0.25), minor=True)
-#         items[2].set_yticklabels([0, 1, 2, 3, 4, 5, 6], fontsize=4)
-#     plt.savefig(f"reports/figures/{df.name}.png", dpi=600)
-#     plt.close()
-# print("Volcano Plots Made!")
+        plt.xlabel("log2(fold_change)", fontdict={"fontsize": label_size})
+        plt.ylabel("-log10(q_score)", fontdict={"fontsize": label_size})
+        plt.show()

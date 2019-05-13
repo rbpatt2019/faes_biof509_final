@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import umap
-from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
 from yellowbrick.text import TSNEVisualizer
 
@@ -38,10 +37,8 @@ pd.to_pickle(frontal_umap, "data/interim/frontal_umap.pkl")
 # Reducer for umap, reccomended to reduce to 50 with PCA, then UMAP
 X_frontal = frontal_umap.drop(columns=["label"])
 y_frontal = frontal_umap["label"]
-pipe_frontal = Pipeline(
-    [("PCA", PCA(n_components=40, random_state=1)), ("UMAP", umap.UMAP(random_state=1))]
-)
-embedding_frontal = pipe_frontal.fit_transform(X_frontal)
+reducer_frontal = umap.UMAP(random_state=1)
+embedding_frontal = reducer_frontal.fit_transform(X_frontal)
 
 # Prep for umap plot - cingulate
 cingulate_umap = (
