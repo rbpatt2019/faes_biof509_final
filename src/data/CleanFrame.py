@@ -316,8 +316,9 @@ class CleanFrame(pd.core.frame.DataFrame):
         plt.title(title, fontdict={"fontsize": title_size}, pad=15)
         plt.gca().set_aspect("equal", "datalim")
         cbar = plt.colorbar(
-            boundaries=np.arange(len(y.unique())) - 0.5,
+            boundaries=np.arange(len(y.unique()) + 1) - 0.5,
             ticks=np.arange(len(y.unique())),
+            shrink=0.33,
         )
         cbar.ax.set_yticklabels(list(y.unique()), fontdict={"fontsize": label_size})
 
