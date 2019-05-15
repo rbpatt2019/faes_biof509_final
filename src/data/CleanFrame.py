@@ -234,10 +234,24 @@ class CleanFrame(pd.core.frame.DataFrame):
         plt.xlabel("log2(fold_change)", fontdict={"fontsize": label_size}, labelpad=5)
         plt.ylabel("-log10(q_score)", fontdict={"fontsize": label_size}, labelpad=10)
         plt.tick_params(axis="both", labelsize=label_size)
-        plt.savefig(path, dpi=600)
+
+        # Show or save
+        if save:
+            plt.savefig(path, dpi=600)
+        if show:
+            plt.show()
 
     def umap(
-        self, X_list, y_name, title="UMAP Plot", title_size=12, label_size=8, **kwargs
+        self,
+        X_list,
+        y_name,
+        title="UMAP Plot",
+        title_size=12,
+        label_size=8,
+        show=True,
+        save=False,
+        path="report/figures/umap.png",
+        **kwargs,
     ):
         """Makes a UMAP plot of the data
 
@@ -282,10 +296,10 @@ class CleanFrame(pd.core.frame.DataFrame):
         # Reducer for umap
         X, y = self[X_list], self[y_name]
         reducer = umap.UMAP(random_state=1, **kwargs)
-        embedding = reducer_cingulate.fit_transform(X_cingulate)
+        embedding = reducer.fit_transform(X)
 
         # Create conditions/choices for colors, leave first for default
-        choices = np.arange(len(y))
+        choices = np.arange(1, len(y.unique()))
         conditions = [y == item for item in y.unique()[1:]]
 
         # Plot UMAP
@@ -293,7 +307,7 @@ class CleanFrame(pd.core.frame.DataFrame):
             embedding[:, 0],
             embedding[:, 1],
             s=5,
-            c=np.select(conditions, choices, y.unique()[0]),
+            c=np.select(conditions, choices, 0),
             cmap="Spectral",
         )
 
@@ -306,5 +320,9 @@ class CleanFrame(pd.core.frame.DataFrame):
             ticks=np.arange(len(y.unique())),
         )
         cbar.ax.set_yticklabels(list(y.unique()), fontdict={"fontsize": label_size})
-        plt.savefig(path, dpi=600)
-        plt.close()
+
+        # Show or save
+        if save:
+            plt.savefig(path, dpi=600)
+        if show:
+            plt.show()
