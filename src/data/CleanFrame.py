@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import umap
 import seaborn as sns
+import umap
 from matplotlib.colors import LinearSegmentedColormap
 
 import src.data.CleanFrame as cf
@@ -206,7 +206,9 @@ class CleanFrame(pd.core.frame.DataFrame):
             x, y = self[x], self[y]
 
         # Create red, black green custom color map
-        cmap = LinearSegmentedColormap.from_list("Volcano", [(1, 0, 0), (0, 0, 0), (0, 1, 0)], N=3)
+        cmap = LinearSegmentedColormap.from_list(
+            "Volcano", [(1, 0, 0), (0, 0, 0), (0, 1, 0)], N=3
+        )
 
         # Establish colors
         conditions = [(y >= q_cut) & (x >= fold_cut), (y >= q_cut) & (x <= -fold_cut)]
@@ -218,9 +220,9 @@ class CleanFrame(pd.core.frame.DataFrame):
         plt.axvline(fold_cut, linestyle="--", color="gray", linewidth=1)
         plt.axvline(-fold_cut, linestyle="--", color="gray", linewidth=1)
         plt.axhline(q_cut, linestyle="--", color="gray", linewidth=1)
-        sns.despine(offset=5, trim=False)
 
         # Plot settings
+        sns.despine(offset=5, trim=False)
         plt.title(title, fontdict={"fontsize": title_size}, pad=15)
         plt.gca().set_aspect("equal", "datalim")
         cbar = plt.colorbar(
@@ -231,10 +233,12 @@ class CleanFrame(pd.core.frame.DataFrame):
         )
         plt.xlabel("log2(fold_change)", fontdict={"fontsize": label_size}, labelpad=5)
         plt.ylabel("-log10(q_score)", fontdict={"fontsize": label_size}, labelpad=10)
-        plt.tick_params(axis='both', labelsize=label_size)
+        plt.tick_params(axis="both", labelsize=label_size)
         plt.savefig(path, dpi=600)
 
-    def umap(self, X_list, y_name, title="UMAP Plot", title_size=12, label_size=8, **kwargs):
+    def umap(
+        self, X_list, y_name, title="UMAP Plot", title_size=12, label_size=8, **kwargs
+    ):
         """Makes a UMAP plot of the data
 
         Inputs
@@ -262,10 +266,10 @@ class CleanFrame(pd.core.frame.DataFrame):
         -------
         """
         # Type check inputs
-        for i in (y_name, title):
+        for i in (y_name, title, path):
             if not isinstance(i, str):
                 raise ValueError(f"{i} must be a str")
-        for i in (is_log, save, show):
+        for i in (save, show):
             if not isinstance(i, bool):
                 raise ValueError(f"{i} must be a bool")
         for var in (title_size, label_size):
@@ -276,31 +280,31 @@ class CleanFrame(pd.core.frame.DataFrame):
                 raise
 
         # Reducer for umap
-        X = self[X_list]
-        y = self[y_name]
+        X, y = self[X_list], self[y_name]
         reducer = umap.UMAP(random_state=1, **kwargs)
         embedding = reducer_cingulate.fit_transform(X_cingulate)
 
-        # Create conditions/choices for colors
+        # Create conditions/choices for colors, leave first for default
         choices = np.arange(len(y))
-        conditions = [y == item for item in y]
+        conditions = [y == item for item in y.unique()[1:]]
 
         # Plot UMAP
-        for data in zip(
-            (embedding_frontal, embedding_cingulate),
-            (cond_frontal, cond_cingulate),
-            ("Frontal", "Cingulate"),
-        ):
-            plt.scatter(
-                data[0][:, 0],
-                data[0][:, 1],
-                s=5,
-                c=np.select(data[1], choices, 0),
-                cmap="Spectral",
-            )
-            plt.gca().set_aspect("equal", "datalim")
-            cbar = plt.colorbar(boundaries=np.arange(5) - 0.5, ticks=np.arange(4))
-            cbar.ax.set_yticklabels(["Control", "AD", "PD", "ADPD"])
-            plt.title(f"UMAP Plot - {data[2]}")
-            plt.savefig(f"reports/figures/UMAP_{data[2]}.png", dpi=600)
-            plt.close()
+        plt.scatter(
+            embedding[:, 0],
+            embedding[:, 1],
+            s=5,
+            c=np.select(conditions, choices, y.unique()[0]),
+            cmap="Spectral",
+        )
+
+        # Plot settings
+        sns.despine(offset=5, trim=False)
+        plt.title(title, fontdict={"fontsize": title_size}, pad=15)
+        plt.gca().set_aspect("equal", "datalim")
+        cbar = plt.colorbar(
+            boundaries=np.arange(len(y.unique())) - 0.5,
+            ticks=np.arange(len(y.unique())),
+        )
+        cbar.ax.set_yticklabels(list(y.unique()), fontdict={"fontsize": label_size})
+        plt.savefig(path, dpi=600)
+        plt.close()
