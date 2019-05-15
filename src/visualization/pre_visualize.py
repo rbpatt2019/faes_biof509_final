@@ -11,6 +11,7 @@ for visualising clusters
 
 import matplotlib.pyplot as plt
 import pandas as pd
+
 import src.data.CleanFrame as cf
 
 
@@ -93,4 +94,3 @@ if __name__ == "__main__":
                 path=f"reports/figures/{data[1]}_{col}.png",
             )
             plt.close()
-
