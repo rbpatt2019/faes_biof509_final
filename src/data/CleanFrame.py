@@ -245,6 +245,7 @@ class CleanFrame(pd.core.frame.DataFrame):
         self,
         X_list,
         y_name,
+        plt_comp=(0, 1),
         title="UMAP Plot",
         title_size=12,
         label_size=8,
@@ -261,6 +262,8 @@ class CleanFrame(pd.core.frame.DataFrame):
             List of columns to be used as features
         y_name: str
             Column containing labels
+        plt_comp: tuple
+            Dimensions to be plotted
         title: str, Optional
             Plot title
         title_size: numeric, Optional
@@ -292,6 +295,8 @@ class CleanFrame(pd.core.frame.DataFrame):
             except (ValueError, TypeError) as err:
                 print(f"{var} needs to be numeric")
                 raise
+        if not isinstance(plt_comp, tuple):
+            raise ValueError(f'plt_comp must be a tuple')
 
         # Reducer for umap
         X, y = self[X_list], self[y_name]
@@ -304,8 +309,8 @@ class CleanFrame(pd.core.frame.DataFrame):
 
         # Plot UMAP
         plt.scatter(
-            embedding[:, 0],
-            embedding[:, 1],
+            embedding[:, plt_comp[0]],
+            embedding[:, plt_comp[1]],
             s=5,
             c=np.select(conditions, choices, 0),
             cmap="Spectral",

@@ -85,6 +85,7 @@ if __name__ == "__main__":
 
     for data in zip((frontal_umap, cingulate_umap), ("Frontal", "Cingulate")):
         for col in ("label", "batch"):
+            # Plot first 2 dimensions
             data[0].umap(
                 (x for x in data[0].columns if x not in ["label", "batch"]),
                 col,
@@ -92,6 +93,18 @@ if __name__ == "__main__":
                 show=False,
                 save=True,
                 path=f"reports/figures/{data[1]}_{col}.png",
+            )
+            plt.close()
+            # Reduces to 3 and plot 2 and third
+            data[0].umap(
+                (x for x in data[0].columns if x not in ["label", "batch"]),
+                col,
+                plt_comp=(1, 2),
+                title=f"{data[1]} {col}",
+                show=False,
+                save=True,
+                path=f"reports/figures/{data[1]}_{col}_23.png",
+                n_components=3,
             )
             plt.close()
 
