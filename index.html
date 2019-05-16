@@ -13255,7 +13255,7 @@ a.anchor-link {
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Command-line-notebooks!">Command line notebooks!<a class="anchor-link" href="#Command-line-notebooks!">&#182;</a></h2><p>Shout out to Martin's nbless package!</p>
 <div class="highlight"><pre><span></span>nbless notebooks/slides/slide_* -o notebooks/index.ipynb
-nbdeck notebooks/index.ipynb
+nbdeck notebooks/index.ipynb -o notebooks/index.ipynb
 nbconv notebooks/index.ipynb -e slides -o index.html
 cp index.html reports/index.html
 </pre></div>
@@ -13296,140 +13296,18 @@ doi:10.1038/sdata.2018.36</p>
 
 </div>
 </div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[1]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
-<span class="kn">import</span> <span class="nn">umap</span>
-<span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="k">import</span> <span class="n">LinearSegmentedColormap</span>
-
-<span class="kn">import</span> <span class="nn">src.data.CleanFrame</span> <span class="k">as</span> <span class="nn">cf</span>
-
-
-<span class="k">class</span> <span class="nc">CleanFrame</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Sub-classed DataFrame with expanded method for cleaning</span>
-<span class="sd">    </span>
-<span class="sd">    Frequently, when loading data, a number of cleaning steps are performed that do not have direct functions in the pandas module.</span>
-<span class="sd">    This class seeks to add those functionalities on top of pandas to expand its capacity</span>
-
-<span class="sd">    Methods</span>
-<span class="sd">    -------</span>
-<span class="sd">    clean_cols: </span>
-<span class="sd">        Cleans column names by stripping white space, removing white space, and converting all characters to either lower or upper case</span>
-<span class="sd">    filter_by_val:</span>
-<span class="sd">        Select rows based on values in a given column</span>
-<span class="sd">    volcano:</span>
-<span class="sd">        Makes volcano plots</span>
-<span class="sd">    umap:</span>
-<span class="sd">        performs UMAP for dimension reduction and plots the results</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+</div></section></section><section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Sub-classing-DataFrames">Sub-classing DataFrames<a class="anchor-link" href="#Sub-classing-DataFrames">&#182;</a></h2><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">CleanFrame</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_constructor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">CleanFrame</span>
 
-    <span class="k">def</span> <span class="nf">clean_cols</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">spaces</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">space_char</span><span class="o">=</span><span class="s2">&quot;_&quot;</span><span class="p">,</span>
-        <span class="n">lower</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">upper</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Cleans column names</span>
-
-<span class="sd">        Inputs</span>
-<span class="sd">        ------</span>
-<span class="sd">        strip: bool</span>
-<span class="sd">            default: True</span>
-<span class="sd">            Whether to strip leading and trailing whitespace</span>
-<span class="sd">        spaces: bool</span>
-<span class="sd">            default: True</span>
-<span class="sd">            Whether to replace spaces with space_char</span>
-<span class="sd">            Note that odd behaviour results if strip=True and spaces=False</span>
-<span class="sd">        space_char: str</span>
-<span class="sd">            default: &#39;_&#39;</span>
-<span class="sd">            If spaces=True, then &#39; &#39; will be replaced with this value</span>
-<span class="sd">        lower: bool</span>
-<span class="sd">            default: True</span>
-<span class="sd">            Whether to convert all letters to lower case</span>
-<span class="sd">            Note that odd behaviour will results if both lower=True and upper=True</span>
-<span class="sd">        upper: bool</span>
-<span class="sd">            default: False</span>
-<span class="sd">            Whether to convert all letters to upper case</span>
-<span class="sd">            Note that odd behaviour will results if both lower=True and upper=True</span>
-<span class="sd">        inplace: bool</span>
-<span class="sd">            If true, the operation occurs inplace, altering self.</span>
-
-<span class="sd">        Outputs</span>
-<span class="sd">        -------</span>
-<span class="sd">        new_data: CleanFrame</span>
-<span class="sd">            Only if inplace=False</span>
-<span class="sd">            The cleaned dataframe</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
+    <span class="k">def</span> <span class="nf">filter_by_val</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">vals</span><span class="o">=</span><span class="p">[],</span> <span class="n">keep</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="c1"># Type check inputs</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="n">strip</span><span class="p">,</span> <span class="n">spaces</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">,</span> <span class="n">inplace</span><span class="p">):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{i}</span><span class="s2"> must be a bool&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">space_char</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;space_char must be a str&quot;</span><span class="p">)</span>
-
-        <span class="c1"># Operate</span>
-        <span class="n">new_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">strip</span><span class="p">:</span>
-            <span class="n">new_data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">new_data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">spaces</span><span class="p">:</span>
-            <span class="n">new_data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">new_data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">space_char</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">lower</span><span class="p">:</span>
-            <span class="n">new_data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">new_data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">upper</span><span class="p">:</span>
-            <span class="n">new_data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">new_data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-
-        <span class="c1"># self._update_inplace is from pandas.core.frame</span>
-        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_update_inplace</span><span class="p">(</span><span class="n">new_data</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">new_data</span>
-
-    <span class="k">def</span> <span class="nf">filter_by_val</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">vals</span><span class="o">=</span><span class="p">[],</span> <span class="n">keep</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Keeps rows of a dataframe based on value(s) in a column(s)</span>
-
-<span class="sd">        Inputs</span>
-<span class="sd">        ------</span>
-<span class="sd">        cols: str</span>
-<span class="sd">            column name to be used for filtering. col must be in self.columns</span>
-<span class="sd">        vals: list  </span>
-<span class="sd">            Values to search for in columns</span>
-<span class="sd">        keep: bool</span>
-<span class="sd">            If false, drop rows where vals are in cols</span>
-<span class="sd">            If true, drop rows where vals are NOT in cols</span>
-<span class="sd">        inplace: bool</span>
-<span class="sd">            If true, the operation occurs inplace, altering self.</span>
-
-<span class="sd">        Outputs</span>
-<span class="sd">        -------</span>
-<span class="sd">        new_data: CleanFrame</span>
-<span class="sd">            Only if inplace=False</span>
-<span class="sd">            The cleaned dataframe</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># Type check inputs</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="n">keep</span><span class="p">,</span> <span class="n">inplace</span><span class="p">):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{i}</span><span class="s2"> must be a bool&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;col must be a str in self.columns&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;vals must be a list or tuple&quot;</span><span class="p">)</span>
-
         <span class="c1"># Operate, checking whether to keep or discard</span>
         <span class="k">if</span> <span class="n">keep</span><span class="p">:</span>
             <span class="n">new_data</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">vals</span><span class="p">)]</span>
@@ -13441,76 +13319,72 @@ doi:10.1038/sdata.2018.36</p>
             <span class="bp">self</span><span class="o">.</span><span class="n">_update_inplace</span><span class="p">(</span><span class="n">new_data</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">new_data</span>
+</pre></div>
 
+</div>
+</div>
+</div></section></section><section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Make-Data">Make Data<a class="anchor-link" href="#Make-Data">&#182;</a></h2><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">src.data.CleanFrame</span> <span class="kn">as</span> <span class="nn">cf</span>
+
+<span class="k">def</span> <span class="nf">make_data</span><span class="p">(</span>
+    <span class="n">files</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="s2">&quot;outer&quot;</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="bp">None</span>
+<span class="p">):</span>
+    <span class="c1"># Type check files</span>
+    <span class="c1"># Find files</span>
+    <span class="n">paths</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">iglob</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+    <span class="c1"># Read in files, sep=None with engine=&#39;python&#39; will auto determine delim</span>
+    <span class="n">reads</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+            <span class="nb">file</span><span class="p">,</span>
+            <span class="n">usecols</span><span class="o">=</span><span class="n">usecols</span><span class="p">,</span>
+            <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">names</span><span class="o">=</span><span class="n">names</span><span class="p">,</span>
+            <span class="n">index_col</span><span class="o">=</span><span class="n">index_col</span><span class="p">,</span>
+            <span class="n">sep</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="nb">file</span> <span class="ow">in</span> <span class="n">paths</span>
+    <span class="p">)</span>
+    <span class="c1"># Convert to CleanFrame</span>
+    <span class="n">cfs</span> <span class="o">=</span> <span class="p">(</span><span class="n">cf</span><span class="o">.</span><span class="n">CleanFrame</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">reads</span><span class="p">)</span>
+    <span class="c1"># Clean data</span>
+    <span class="n">clean</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">prep_data</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cfs</span><span class="p">)</span>
+    <span class="c1"># Create final CleanFrame</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">cf</span><span class="o">.</span><span class="n">CleanFrame</span><span class="p">(</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">clean</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="n">join</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="n">keys</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span>
+</pre></div>
+
+</div>
+</div>
+</div></section></section><section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Volcano-Plots">Volcano Plots<a class="anchor-link" href="#Volcano-Plots">&#182;</a></h2><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">CleanFrame</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">volcano</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">x</span><span class="p">,</span>
         <span class="n">y</span><span class="p">,</span>
-        <span class="n">is_log</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">is_log</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
         <span class="n">fold_cut</span><span class="o">=</span><span class="mf">0.585</span><span class="p">,</span>
         <span class="n">q_cut</span><span class="o">=</span><span class="mf">1.301</span><span class="p">,</span>
         <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Volcano Plot&quot;</span><span class="p">,</span>
         <span class="n">title_size</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
         <span class="n">label_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
-        <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">show</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+        <span class="n">save</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="s2">&quot;reports/figures/volcano.png&quot;</span><span class="p">,</span>
     <span class="p">):</span>
 
-        <span class="sd">&quot;&quot;&quot;Makes a volcano plot of the data</span>
-
-<span class="sd">        Inputs</span>
-<span class="sd">        ------</span>
-<span class="sd">        x: str</span>
-<span class="sd">        Column name containing fold change values</span>
-<span class="sd">        y: str</span>
-<span class="sd">        Column name containing q_scores</span>
-<span class="sd">        is_log: bool, Optional</span>
-<span class="sd">        Whether or not the passed data has already had its log taken</span>
-<span class="sd">        If false, the appropriate log will be taken of both x and y</span>
-<span class="sd">        fold_cut: numeric, Optional</span>
-<span class="sd">        log2(fold_change) to consider significant</span>
-<span class="sd">        Default is fold_change greater than 1.5</span>
-<span class="sd">        fold_cut: numeric, Optional</span>
-<span class="sd">        -log10(q_score) to consider significant</span>
-<span class="sd">        Default is q_score less than 0.05</span>
-<span class="sd">        title: str, Optional</span>
-<span class="sd">        Plot title</span>
-<span class="sd">        title_size: numeric, Optional</span>
-<span class="sd">        Font size, in pts, to use for Figure title</span>
-<span class="sd">        label_size: numeric, Optional</span>
-<span class="sd">        Font size, in pts, to use for axes title</span>
-<span class="sd">        show: bool, Optional</span>
-<span class="sd">        If true, display the plot</span>
-<span class="sd">        save: bool, Optional</span>
-<span class="sd">        If true, save the plot</span>
-<span class="sd">        path: str, Optional</span>
-<span class="sd">        Where to save the plot, if save == True</span>
-
-<span class="sd">        Outputs</span>
-<span class="sd">        -------</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="c1"># Type check inputs</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{i}</span><span class="s2"> must be a str&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="n">is_log</span><span class="p">,</span> <span class="n">show</span><span class="p">,</span> <span class="n">save</span><span class="p">):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{i}</span><span class="s2"> must be a bool&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="p">(</span><span class="n">title_size</span><span class="p">,</span> <span class="n">label_size</span><span class="p">):</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="nb">float</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
-            <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{var}</span><span class="s2"> needs to be numeric&quot;</span><span class="p">)</span>
-                <span class="k">raise</span>
-
         <span class="c1"># Log, if necessary</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_log</span><span class="p">:</span>
-            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">x</span><span class="p">]),</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">y</span><span class="p">])</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">y</span><span class="p">]</span>
-
         <span class="c1"># Create red, black green custom color map</span>
         <span class="n">cmap</span> <span class="o">=</span> <span class="n">LinearSegmentedColormap</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span>
             <span class="s2">&quot;Volcano&quot;</span><span class="p">,</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)],</span> <span class="n">N</span><span class="o">=</span><span class="mi">3</span>
@@ -13528,25 +13402,71 @@ doi:10.1038/sdata.2018.36</p>
         <span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">q_cut</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="c1"># Plot settings</span>
-        <span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">offset</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">trim</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fontsize&quot;</span><span class="p">:</span> <span class="n">title_size</span><span class="p">},</span> <span class="n">pad</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">,</span> <span class="s2">&quot;datalim&quot;</span><span class="p">)</span>
-        <span class="n">cbar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span>
-            <span class="n">boundaries</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">ticks</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.33</span>
-        <span class="p">)</span>
-        <span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span>
-            <span class="p">[</span><span class="s2">&quot;Sig. Under&quot;</span><span class="p">,</span> <span class="s2">&quot;N.S.&quot;</span><span class="p">,</span> <span class="s2">&quot;Sig. Over&quot;</span><span class="p">],</span> <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fontsize&quot;</span><span class="p">:</span> <span class="n">label_size</span><span class="p">}</span>
-        <span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;log2(fold_change)&quot;</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fontsize&quot;</span><span class="p">:</span> <span class="n">label_size</span><span class="p">},</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;-log10(q_score)&quot;</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fontsize&quot;</span><span class="p">:</span> <span class="n">label_size</span><span class="p">},</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="n">label_size</span><span class="p">)</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">offset</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">trim</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="c1"># And others...</span>
 
         <span class="c1"># Show or save</span>
         <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
 
+</div>
+</div>
+</div></section></section><section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Volcano-Plots---Frontal-Cortex---Alzheimers">Volcano Plots - Frontal Cortex - Alzheimers<a class="anchor-link" href="#Volcano-Plots---Frontal-Cortex---Alzheimers">&#182;</a></h2><p><img src="reports/figures/Frontal_mean_ad.png" alt="Frontal_volcano_plot"></p>
+
+</div>
+</div>
+</div></section></section><section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Volcano-Plots---Frontal-Cortex---Parkinson's">Volcano Plots - Frontal Cortex - Parkinson's<a class="anchor-link" href="#Volcano-Plots---Frontal-Cortex---Parkinson's">&#182;</a></h2><p><img src="reports/figures/Frontal_mean_pd.png" alt="Frontal_volcano_plot"></p>
+
+</div>
+</div>
+</div></section></section><section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Volcano-Plots---Frontal-Cortex---Dual-Diagnosis">Volcano Plots - Frontal Cortex - Dual Diagnosis<a class="anchor-link" href="#Volcano-Plots---Frontal-Cortex---Dual-Diagnosis">&#182;</a></h2><p><img src="reports/figures/Frontal_mean_adpd.png" alt="Frontal_volcano_plot"></p>
+
+</div>
+</div>
+</div></section></section><section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Volcano-Plots---Anterior-Cingulate-Gyrus---Alzheimer's">Volcano Plots - Anterior Cingulate Gyrus - Alzheimer's<a class="anchor-link" href="#Volcano-Plots---Anterior-Cingulate-Gyrus---Alzheimer's">&#182;</a></h2><p><img src="reports/figures/Cingulate_mean_ad.png" alt="Cingulate_volcano_plot"></p>
+
+</div>
+</div>
+</div></section></section><section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Volcano-Plots---Anterior-Cingulate-Gyrus---Parkinson's-Disease">Volcano Plots - Anterior Cingulate Gyrus - Parkinson's Disease<a class="anchor-link" href="#Volcano-Plots---Anterior-Cingulate-Gyrus---Parkinson's-Disease">&#182;</a></h2><p><img src="reports/figures/Cingulate_mean_pd.png" alt="Cingulate_volcano_plot"></p>
+
+</div>
+</div>
+</div></section></section><section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Volcano-Plots---Anterior-Cingulate-Gyrus---Dual-Diagnosis">Volcano Plots - Anterior Cingulate Gyrus - Dual Diagnosis<a class="anchor-link" href="#Volcano-Plots---Anterior-Cingulate-Gyrus---Dual-Diagnosis">&#182;</a></h2><p><img src="reports/figures/Cingulate_mean_adpd.png" alt="Cingulate_volcano_plot"></p>
+
+</div>
+</div>
+</div></section></section><section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="UMAP-Plots">UMAP Plots<a class="anchor-link" href="#UMAP-Plots">&#182;</a></h2><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">CleanFrame</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">umap</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">X_list</span><span class="p">,</span>
@@ -13555,64 +13475,18 @@ doi:10.1038/sdata.2018.36</p>
         <span class="n">title</span><span class="o">=</span><span class="s2">&quot;UMAP Plot&quot;</span><span class="p">,</span>
         <span class="n">title_size</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
         <span class="n">label_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
-        <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">show</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+        <span class="n">save</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="s2">&quot;report/figures/umap.png&quot;</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Makes a UMAP plot of the data</span>
-
-<span class="sd">        Inputs</span>
-<span class="sd">        ------</span>
-<span class="sd">        X_list: iterable</span>
-<span class="sd">            List of columns to be used as features</span>
-<span class="sd">        y_name: str</span>
-<span class="sd">            Column containing labels</span>
-<span class="sd">        plt_comp: tuple</span>
-<span class="sd">            Dimensions to be plotted</span>
-<span class="sd">        title: str, Optional</span>
-<span class="sd">            Plot title</span>
-<span class="sd">        title_size: numeric, Optional</span>
-<span class="sd">            Font size, in pts, to use for Figure title</span>
-<span class="sd">        label_size: numeric, Otional</span>
-<span class="sd">            Font size, in pts, to use for axes title</span>
-<span class="sd">        show: bool, Optional</span>
-<span class="sd">            If true, display the plot</span>
-<span class="sd">        save: bool, Optional</span>
-<span class="sd">            If true, save the plot</span>
-<span class="sd">        path: str, Optional</span>
-<span class="sd">            Where to save the plot, if save == True</span>
-<span class="sd">        kwargs:</span>
-<span class="sd">            Additional parameters to be passed to umap.UMAP()</span>
-
-<span class="sd">        Outputs</span>
-<span class="sd">        -------</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Type check inputs</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="n">y_name</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{i}</span><span class="s2"> must be a str&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="n">save</span><span class="p">,</span> <span class="n">show</span><span class="p">):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{i}</span><span class="s2"> must be a bool&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="p">(</span><span class="n">title_size</span><span class="p">,</span> <span class="n">label_size</span><span class="p">):</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="nb">float</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
-            <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{var}</span><span class="s2"> needs to be numeric&quot;</span><span class="p">)</span>
-                <span class="k">raise</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plt_comp</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;plt_comp must be a tuple&#39;</span><span class="p">)</span>
-
         <span class="c1"># Reducer for umap</span>
         <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">X_list</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">y_name</span><span class="p">]</span>
         <span class="n">reducer</span> <span class="o">=</span> <span class="n">umap</span><span class="o">.</span><span class="n">UMAP</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">embedding</span> <span class="o">=</span> <span class="n">reducer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
         <span class="c1"># Create conditions/choices for colors, leave first for default</span>
-        <span class="n">choices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">unique</span><span class="p">()))</span>
-        <span class="n">conditions</span> <span class="o">=</span> <span class="p">[</span><span class="n">y</span> <span class="o">==</span> <span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">y</span><span class="o">.</span><span class="n">unique</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]]</span>
-
         <span class="c1"># Plot UMAP</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
             <span class="n">embedding</span><span class="p">[:,</span> <span class="n">plt_comp</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
@@ -13623,15 +13497,7 @@ doi:10.1038/sdata.2018.36</p>
         <span class="p">)</span>
 
         <span class="c1"># Plot settings</span>
-        <span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">offset</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">trim</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fontsize&quot;</span><span class="p">:</span> <span class="n">title_size</span><span class="p">},</span> <span class="n">pad</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">,</span> <span class="s2">&quot;datalim&quot;</span><span class="p">)</span>
-        <span class="n">cbar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span>
-            <span class="n">boundaries</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span>
-            <span class="n">ticks</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">unique</span><span class="p">())),</span>
-            <span class="n">shrink</span><span class="o">=</span><span class="mf">0.33</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">unique</span><span class="p">()),</span> <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fontsize&quot;</span><span class="p">:</span> <span class="n">label_size</span><span class="p">})</span>
+        <span class="c1"># Same as volcano</span>
 
         <span class="c1"># Show or save</span>
         <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
@@ -13639,73 +13505,6 @@ doi:10.1038/sdata.2018.36</p>
         <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[2]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">glob</span>
-
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-
-<span class="kn">import</span> <span class="nn">src.data.CleanFrame</span> <span class="k">as</span> <span class="nn">cf</span>
-
-
-<span class="k">def</span> <span class="nf">make_data</span><span class="p">(</span>
-    <span class="n">files</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="s2">&quot;outer&quot;</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="kc">None</span>
-<span class="p">):</span>
-    <span class="c1"># Type check files</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;files must be a str, not {type(files)}&quot;</span><span class="p">)</span>
-    <span class="c1"># Find files</span>
-    <span class="n">paths</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">iglob</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
-    <span class="c1"># Read in files, sep=None with engine=&#39;python&#39; will auto determine delim</span>
-    <span class="n">reads</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
-            <span class="n">file</span><span class="p">,</span>
-            <span class="n">usecols</span><span class="o">=</span><span class="n">usecols</span><span class="p">,</span>
-            <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-            <span class="n">names</span><span class="o">=</span><span class="n">names</span><span class="p">,</span>
-            <span class="n">index_col</span><span class="o">=</span><span class="n">index_col</span><span class="p">,</span>
-            <span class="n">sep</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">paths</span>
-    <span class="p">)</span>
-    <span class="c1"># Convert to CleanFrame</span>
-    <span class="n">cfs</span> <span class="o">=</span> <span class="p">(</span><span class="n">cf</span><span class="o">.</span><span class="n">CleanFrame</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">reads</span><span class="p">)</span>
-    <span class="c1"># Clean data</span>
-    <span class="n">clean</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">prep_data</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cfs</span><span class="p">)</span>
-    <span class="c1"># Create final CleanFrame</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">cf</span><span class="o">.</span><span class="n">CleanFrame</span><span class="p">(</span>
-        <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">clean</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="n">join</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="n">keys</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="n">data</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div></section></section><section><section>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Volcano-Plots---Frontal-Cortex">Volcano Plots - Frontal Cortex<a class="anchor-link" href="#Volcano-Plots---Frontal-Cortex">&#182;</a></h2><p><img src="reports/figures/Frontal_mean_ad.png" alt="Frontal_volcano_plot"> <img src="reports/figures/Frontal_mean_adpd.png" alt="Frontal_volcano_plot"> <img src="reports/figures/Frontal_mean_pd.png" alt="Frontal_volcano_plot"></p>
-
-</div>
-</div>
-</div></section></section><section><section>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Volcano-Plots---Anterior-Cingulate-Gyrus">Volcano Plots - Anterior Cingulate Gyrus<a class="anchor-link" href="#Volcano-Plots---Anterior-Cingulate-Gyrus">&#182;</a></h2><p><img src="reports/figures/Cingulate_mean_ad.png" alt="Cingulate_volcano_plot"> <img src="reports/figures/Cingulate_mean_adpd.png" alt="Cingulate_volcano_plot"> <img src="reports/figures/Cingulate_mean_pd.png" alt="Cingulate_volcano_plot"></p>
 
 </div>
 </div>

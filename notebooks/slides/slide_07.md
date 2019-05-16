@@ -1,16 +1,14 @@
+## Make Data
+
+```python
 import glob
-
 import pandas as pd
-
 import src.data.CleanFrame as cf
-
 
 def make_data(
     files, usecols=None, names=None, index_col=None, axis=0, join="outer", keys=None
 ):
     # Type check files
-    if not isinstance(files, str):
-        raise ValueError(f"files must be a str, not {type(files)}")
     # Find files
     paths = glob.iglob(files)
     # Read in files, sep=None with engine='python' will auto determine delim
@@ -35,3 +33,4 @@ def make_data(
         pd.concat(clean, axis=axis, join=join, keys=keys, sort=False, copy=False)
     )
     return data
+```

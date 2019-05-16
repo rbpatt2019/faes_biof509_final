@@ -1,3 +1,3 @@
-## Volcano Plots - Frontal Cortex
+## Volcano Plots - Frontal Cortex - Dual Diagnosis
 
-![Frontal_volcano_plot](reports/figures/Frontal_mean_ad.png) ![Frontal_volcano_plot](reports/figures/Frontal_mean_adpd.png) ![Frontal_volcano_plot](reports/figures/Frontal_mean_pd.png)
+![Frontal_volcano_plot](reports/figures/Frontal_mean_adpd.png)
