@@ -133,3 +133,4 @@ if __name__ == "__main__":
             save=True,
             path=item[1],
         )
+        plt.close()
