@@ -13466,45 +13466,7 @@ doi:10.1038/sdata.2018.36</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="UMAP-Plots">UMAP Plots<a class="anchor-link" href="#UMAP-Plots">&#182;</a></h2><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">CleanFrame</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">umap</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">X_list</span><span class="p">,</span>
-        <span class="n">y_name</span><span class="p">,</span>
-        <span class="n">plt_comp</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;UMAP Plot&quot;</span><span class="p">,</span>
-        <span class="n">title_size</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
-        <span class="n">label_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
-        <span class="n">show</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-        <span class="n">save</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-        <span class="n">path</span><span class="o">=</span><span class="s2">&quot;report/figures/umap.png&quot;</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="c1"># Type check inputs</span>
-        <span class="c1"># Reducer for umap</span>
-        <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">X_list</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">y_name</span><span class="p">]</span>
-        <span class="n">reducer</span> <span class="o">=</span> <span class="n">umap</span><span class="o">.</span><span class="n">UMAP</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">embedding</span> <span class="o">=</span> <span class="n">reducer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-
-        <span class="c1"># Create conditions/choices for colors, leave first for default</span>
-        <span class="c1"># Plot UMAP</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
-            <span class="n">embedding</span><span class="p">[:,</span> <span class="n">plt_comp</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
-            <span class="n">embedding</span><span class="p">[:,</span> <span class="n">plt_comp</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
-            <span class="n">s</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-            <span class="n">c</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">conditions</span><span class="p">,</span> <span class="n">choices</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-            <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Spectral&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="c1"># Plot settings</span>
-        <span class="c1"># Same as volcano</span>
-
-        <span class="c1"># Show or save</span>
-        <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
+<h2 id="UMAP-Plots---Anterior-Cingulate-Gyrus-by-Disease-Labels">UMAP Plots - Anterior Cingulate Gyrus by Disease Labels<a class="anchor-link" href="#UMAP-Plots---Anterior-Cingulate-Gyrus-by-Disease-Labels">&#182;</a></h2><p><img src="reports/figures/Cingulate_label.png" alt="UMAP cingulate"></p>
 
 </div>
 </div>
@@ -13512,7 +13474,7 @@ doi:10.1038/sdata.2018.36</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="UMAP-Plots---Labels">UMAP Plots - Labels<a class="anchor-link" href="#UMAP-Plots---Labels">&#182;</a></h2><p><img src="reports/figures/Frontal_label.png" alt="UMAP frontal"> <img src="reports/figures/Cingulate_label.png" alt="UMAP cingulate"></p>
+<h2 id="UMAP-Plots---Frontal-Cortex-by-Disease-Labels">UMAP Plots - Frontal Cortex by Disease Labels<a class="anchor-link" href="#UMAP-Plots---Frontal-Cortex-by-Disease-Labels">&#182;</a></h2><p><img src="reports/figures/Frontal_label.png" alt="UMAP frontal"></p>
 
 </div>
 </div>
@@ -13520,7 +13482,7 @@ doi:10.1038/sdata.2018.36</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="UMAP-Plots---Batch-Effect">UMAP Plots - Batch Effect<a class="anchor-link" href="#UMAP-Plots---Batch-Effect">&#182;</a></h2><p><img src="reports/figures/Frontal_batch.png" alt="UMAP frontal"> <img src="reports/figures/Cingulate_batch.png" alt="UMAP cingulate"></p>
+<h2 id="UMAP-Plots---Anterior-Cingulate-Gyrus-by-Batch">UMAP Plots - Anterior Cingulate Gyrus by Batch<a class="anchor-link" href="#UMAP-Plots---Anterior-Cingulate-Gyrus-by-Batch">&#182;</a></h2><p><img src="reports/figures/Cingulate_batch.png" alt="UMAP cingulate"></p>
 
 </div>
 </div>
@@ -13528,7 +13490,7 @@ doi:10.1038/sdata.2018.36</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="UMAP-Plots---Components-2-and-3">UMAP Plots - Components 2 and 3<a class="anchor-link" href="#UMAP-Plots---Components-2-and-3">&#182;</a></h2><p><img src="reports/figures/Frontal_batch_23.png" alt="UMAP frontal"> <img src="reports/figures/Cingulate_batch_23.png" alt="UMAP cingulate"></p>
+<h2 id="UMAP-Plots---Frontal-Cortex-by-Batch">UMAP Plots - Frontal Cortex by Batch<a class="anchor-link" href="#UMAP-Plots---Frontal-Cortex-by-Batch">&#182;</a></h2><p><img src="reports/figures/Frontal_batch.png" alt="UMAP frontal"></p>
 
 </div>
 </div>
@@ -13536,7 +13498,31 @@ doi:10.1038/sdata.2018.36</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="UMAP-Plots---Summary-Data">UMAP Plots - Summary Data<a class="anchor-link" href="#UMAP-Plots---Summary-Data">&#182;</a></h2><p><img src="reports/figures/Frontal_sum_umap.png" alt="UMAP frontal"> <img src="reports/figures/Cingulate_sum_umap.png" alt="UMAP cingulate"></p>
+<h2 id="UMAP-Plots---Anterior-Cingulate-Gyrus-by-Higher-Dimensions">UMAP Plots - Anterior Cingulate Gyrus by Higher Dimensions<a class="anchor-link" href="#UMAP-Plots---Anterior-Cingulate-Gyrus-by-Higher-Dimensions">&#182;</a></h2><p><img src="reports/figures/Cingulate_batch_23.png" alt="UMAP cingulate"></p>
+
+</div>
+</div>
+</div></section></section><section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="UMAP-Plots---Frontal-Cortex,-Higher-Dimensions">UMAP Plots - Frontal Cortex, Higher Dimensions<a class="anchor-link" href="#UMAP-Plots---Frontal-Cortex,-Higher-Dimensions">&#182;</a></h2><p><img src="reports/figures/Frontal_batch_23.png" alt="UMAP frontal"></p>
+
+</div>
+</div>
+</div></section></section><section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="UMAP-Plots---Anterior-Cingulate-Gyrus,-Summary-Data">UMAP Plots - Anterior Cingulate Gyrus, Summary Data<a class="anchor-link" href="#UMAP-Plots---Anterior-Cingulate-Gyrus,-Summary-Data">&#182;</a></h2><p><img src="reports/figures/Cingulate_sum_umap.png" alt="UMAP cingulate"></p>
+
+</div>
+</div>
+</div></section></section><section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="UMAP-Plots---Frontal-Cortex,-Prepared-Summary-Data">UMAP Plots - Frontal Cortex, Prepared Summary Data<a class="anchor-link" href="#UMAP-Plots---Frontal-Cortex,-Prepared-Summary-Data">&#182;</a></h2><p><img src="reports/figures/Frontal_sum_umap.png" alt="UMAP frontal"></p>
 
 </div>
 </div>

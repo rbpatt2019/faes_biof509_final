@@ -1,3 +1,3 @@
-## UMAP Plots - Batch Effect
+## UMAP Plots - Frontal Cortex by Batch
 
-![UMAP frontal](reports/figures/Frontal_batch.png) ![UMAP cingulate](reports/figures/Cingulate_batch.png)
+![UMAP frontal](reports/figures/Frontal_batch.png)

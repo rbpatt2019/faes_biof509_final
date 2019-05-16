@@ -1,3 +1,3 @@
-## UMAP Plots - Components 2 and 3
+## UMAP Plots - Frontal Cortex, Higher Dimensions
 
-![UMAP frontal](reports/figures/Frontal_batch_23.png) ![UMAP cingulate](reports/figures/Cingulate_batch_23.png)
+![UMAP frontal](reports/figures/Frontal_batch_23.png)

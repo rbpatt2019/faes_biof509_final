@@ -1,3 +1,3 @@
-## UMAP Plots - Summary Data
+## UMAP Plots - Frontal Cortex, Prepared Summary Data
 
-![UMAP frontal](reports/figures/Frontal_sum_umap.png) ![UMAP cingulate](reports/figures/Cingulate_sum_umap.png)
+![UMAP frontal](reports/figures/Frontal_sum_umap.png)

@@ -1,3 +1,3 @@
-## UMAP Plots - Labels
+## UMAP Plots - Frontal Cortex by Disease Labels
 
-![UMAP frontal](reports/figures/Frontal_label.png) ![UMAP cingulate](reports/figures/Cingulate_label.png)
+![UMAP frontal](reports/figures/Frontal_label.png)
