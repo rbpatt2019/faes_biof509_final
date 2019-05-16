@@ -37,7 +37,7 @@ clean:
 ## Make presentation slides
 slides: 
 	nbless notebooks/slides/slide* -o notebooks/index.ipynb
-	nbdeck notebooks/index.ipynb 
+	nbdeck notebooks/index.ipynb -o notebooks/index.ipynb
 	nbconv notebooks/index.ipynb -e slides -o reports/index.html
 	cp reports/index.html index.html
 
