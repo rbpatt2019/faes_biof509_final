@@ -1,3 +1,10 @@
+import glob
+
+import pandas as pd
+
+import src.data.CleanFrame as cf
+
+
 def make_data(
     files, usecols=None, names=None, index_col=None, axis=0, join="outer", keys=None
 ):
