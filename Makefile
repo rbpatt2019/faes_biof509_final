@@ -38,7 +38,7 @@ clean:
 slides: 
 	nbless notebooks/slides/slide* -o notebooks/index.ipynb
 	nbdeck notebooks/index.ipynb -o notebooks/index.ipynb
-	nbconv notebooks/index.ipynb -e slides -o reports/index.html
+	jupyter nbconvert --to slides notebooks/index.ipynb
 	cp reports/index.html index.html
 
 ## Lint using flake8
