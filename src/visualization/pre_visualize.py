@@ -31,8 +31,8 @@ def prep_volcano(cf):
     return cf_clean
 
 
-def prep_umap(cf):
-    """Prep data for volcano plots
+def prep_umap(cf, col="label", vals=["q_score", "pep_score"]):
+    """Prep data for umap plots
 
     Cleans off unnecessary columns information then aggregates by means
     """
@@ -40,12 +40,12 @@ def prep_umap(cf):
         cf.T.reset_index()
         .rename_axis(columns=None)
         .rename(columns={"level_0": "batch", "level_1": "label"})
-        .filter_by_val(col="label", vals=["q_score", "pep_score"], keep=False)
+        .filter_by_val(col=col, vals=vals, keep=False)
         .sort_values(by=["label"])
         .reset_index()
         .drop(columns=["index"])
     )
-    cf_clean["label"] = cf_clean["label"].str[:-1]
+    cf_clean["label"] = cf_clean["label"].str.extract("(\D+)", expand=False)
     cf_clean["label"] = cf_clean["label"].astype("category")
     return cf_clean
 
@@ -94,3 +94,42 @@ if __name__ == "__main__":
                 path=f"reports/figures/{data[1]}_{col}.png",
             )
             plt.close()
+
+    # Examine their summary data
+    data = (
+        cf.CleanFrame(
+            pd.read_excel(
+                "references/TMT_Summary_Data.xlsx",
+                sheet_name=sheet,
+                header=(0, 2),
+                index=0,
+            )
+        )
+        for sheet in ("frontal cortex", "anterior cingulate gyrus")
+    )
+
+    # Clean Data
+    titles = (
+        "Frontal Cortex TMT Summary Data.#",
+        "Anterior Cingulate Gyrus TMT Summary Data.#",
+    )
+    data_prep = (
+        prep_umap(item[0], col="batch", vals=[item[1]]) for item in zip(data, titles)
+    )
+
+    # Drop NaNs
+    data_clean = (cf.loc[:, (cf != 0).all()].dropna(axis=1) for cf in data_prep)
+
+    # Plot data
+    paths = (
+        "reports/figures/Frontal_sum_umap.png",
+        "reports/figures/Cingulate_sum_umap.png",
+    )
+    for item in zip(data_clean, paths):
+        item[0].umap(
+            [i for i in item[0].columns if i not in ["batch", "label"]],
+            "label",
+            show=False,
+            save=True,
+            path=item[1],
+        )
