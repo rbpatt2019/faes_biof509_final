@@ -37,7 +37,7 @@ clean:
 ## Make presentation slides
 slides: 
 	nbless notebooks/slides/slide* -o notebooks/index.ipynb
-	nbdeck notebooks/index.ipynb -o notebooks/index.ipynb
+	nbdeck notebooks/index.ipynb 
 	jupyter nbconvert --to slides notebooks/index.ipynb
 	cp reports/index.html index.html
 
